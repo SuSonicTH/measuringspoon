@@ -1,5 +1,14 @@
 # measuringSpoon
 
+<p align="center">
+  <img src="render/hero-5ml-blue-white.png" alt="A 5 ml measuring spoon with a blue body and a white 5 ml inlay on the handle" width="900">
+</p>
+
+<p align="center"><em>5 ml spoon in blue with a white engraved inlay
+(<code>volumeMode = "volume"</code>, <code>volumeCm3 = 5</code>,
+<code>spoonColor = "blue"</code>, <code>textColor = "white"</code>,
+<code>showLabel = "colored"</code>).</em></p>
+
 A parametric measuring spoon you can generate for an exact volume — or for an
 exact weight of a given ingredient — with a printable, colour-fillable label on
 the handle.
@@ -185,11 +194,11 @@ never takes volume out of the bowl.
 
 **`handleLength`** is measured along the spoon from the **outside of the bowl**
 to the **centre of the rounded tip**, so the overall length of the spoon is
-`2 × outer bowl radius + handleLength + half the tip width`. A 45 mm handle plus
-a 5 g bowl gives about 86 mm overall. Shorten it to about 25–30 mm for a
-compact/pocket spoon; lengthen to 70 mm+ for a long-reach jar spoon. Very long
-handles with a thick, wide profile become rigid; keep `handleThickness` around
-`2.5–4 mm` for a good stiffness/weight balance.
+`2 × outer bowl radius + rimLip + handleLength + half the tip width`. A 45 mm
+handle plus a 5 g bowl gives about 88 mm overall. Shorten it to about 25–30 mm
+for a compact/pocket spoon; lengthen to 70 mm+ for a long-reach jar spoon. Very
+long handles with a thick, wide profile become rigid; keep `handleThickness`
+around `2.5–4 mm` for a good stiffness/weight balance.
 
 **`handleWidth`** and **`handleTipWidth`** set the profile. A wider root
 (`handleWidth`) spreads the load where the handle meets the bowl; a narrower
@@ -348,13 +357,13 @@ All examples use the default 45 mm handle, `depthRatio = 0.5`, and
 
 | What you want | Settings | Approx. bowl dia × depth | Overall length |
 |---|---|---|---|
-| 1 ml / 1 g water | `volumeMode = "volume"`, `volumeCm3 = 1` | 19.7 × 4.9 mm | ~72 mm |
-| 2.5 ml | `volumeMode = "volume"`, `volumeCm3 = 2.5` | 26.7 × 6.7 mm | ~79 mm |
-| 5 g water | `volumeMode = "grams"`, `density = 1.0`, `gramsPerSpoon = 5` | 33.7 × 8.4 mm | ~86 mm |
-| 5 g sugar | `density = 0.85`, `gramsPerSpoon = 5` | 35.6 × 8.9 mm | ~88 mm |
-| 5 g salt | `density = 1.2`, `gramsPerSpoon = 5` | 31.7 × 7.9 mm | ~84 mm |
-| 5 g flour | `density = 0.55`, `gramsPerSpoon = 5` | 41.1 × 10.3 mm | ~94 mm |
-| 1 tablespoon | `volumeMode = "volume"`, `volumeCm3 = 15` | 48.6 × 12.1 mm | ~101 mm |
+| 1 ml / 1 g water | `volumeMode = "volume"`, `volumeCm3 = 1` | 19.7 × 4.9 mm | ~74 mm |
+| 2.5 ml | `volumeMode = "volume"`, `volumeCm3 = 2.5` | 26.7 × 6.7 mm | ~81 mm |
+| 5 g water | `volumeMode = "grams"`, `density = 1.0`, `gramsPerSpoon = 5` | 33.7 × 8.4 mm | ~88 mm |
+| 5 g sugar | `density = 0.85`, `gramsPerSpoon = 5` | 35.6 × 8.9 mm | ~90 mm |
+| 5 g salt | `density = 1.2`, `gramsPerSpoon = 5` | 31.7 × 7.9 mm | ~86 mm |
+| 5 g flour | `density = 0.55`, `gramsPerSpoon = 5` | 41.1 × 10.3 mm | ~95 mm |
+| 1 tablespoon | `volumeMode = "volume"`, `volumeCm3 = 15` | 48.6 × 12.1 mm | ~103 mm |
 
 Bowl sizes are interior; add `2 × wallThickness` for the outside, plus
 `2 × rimLip` at the rim. Making a set? Generate each spoon with the same
@@ -363,6 +372,36 @@ only change the volume — they will look like a matched set. If you want every
 spoon in the set to have the **same bowl diameter** (e.g. to stack or to fit a
 holder), set `bowlMode` to `Fixed diameter` with a common `bowlDiameter`; the
 depths will then differ instead.
+
+---
+
+## Sample renders
+
+All sample spoons are **5 ml** (`volumeMode = "volume"`, `volumeCm3 = 5`) and
+use the default settings except for the parameter shown in each caption. The
+bowl and handle samples use `spoonColor = "gray"` and the default engraved
+label; the image at the top of this README shows the coloured inlay.
+
+### Bowl shape
+
+| `depthRatio = 0.5` (default) | `depthRatio = 1.0` | Fixed diameter, `bowlDiameter = 45` |
+|---|---|---|
+| ![Default shallow bowl](render/bowl-depth-0.5.png) | ![Deep bowl](render/bowl-depth-1.0.png) | ![Wide fixed-diameter bowl](render/bowl-fixed-45mm.png) |
+| 33.7 mm diameter × 8.4 mm deep — wide, shallow and easy to level. | 26.7 mm diameter × 13.4 mm deep — same volume, deeper and narrower. | 45 mm diameter × 4.7 mm deep — the width is fixed, so the depth follows from the volume. |
+
+### Handle length
+
+| `handleLength = 25` (short) | `handleLength = 45` (default) | `handleLength = 70` (long) |
+|---|---|---|
+| ![Short handle](render/handle-length-25mm.png) | ![Default handle](render/handle-length-45mm.png) | ![Long handle](render/handle-length-70mm.png) |
+| Compact spoon, about 68 mm overall. | Standard spoon, about 88 mm overall. | Long-reach spoon, about 113 mm overall, for deep jars. |
+
+### Label
+
+| `showLabel = "cut"`, `labelSize = 7` | `showLabel = "colored"`, `labelText = "TSP"` |
+|---|---|
+| ![Large engraved label](render/label-cut-large.png) | ![Coloured TSP inlay](render/label-colored-tsp.png) |
+| Engraved in the body colour with a larger 7 mm font. | Two-colour inlay: 6 mm "TSP" in yellow on a navy handle (`spoonColor = "navy"`, `textColor = "yellow"`). |
 
 ---
 
@@ -490,6 +529,7 @@ to export the cavity plug for verification.
 ## Files
 
 - `measuringSpoon.scad` — the parametric model (everything is in this file)
+- `render/` — the sample renders shown in this README
 - `README.md` — this document
 - `LICENSE.md` — MIT licence
 
