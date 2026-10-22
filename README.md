@@ -11,7 +11,7 @@ engraved or two-colour label showing what the spoon measures.
 - **One file:** `measuringSpoon.scad`
 - **Designed for:** OpenSCAD 2021.01 or newer
 - **Units:** millimetres, grams, g/cm³, cm³ (ml)
-- **Printing:** bowl opening up, no supports
+- **Printing:** bowl opening down (rim and handle on the build plate)
 
 ---
 
@@ -30,7 +30,10 @@ engraved or two-colour label showing what the spoon measures.
    bottom of the window (*View → Hide/Show Console* if it is hidden) and in the
    3D view.
 5. Press `F6` for a full render, then *File → Export → Export as STL*.
-   Save it, slice, print.
+   Save it.
+6. In your slicer, flip the spoon over so the **bowl opening faces the build
+   plate** and the rim and handle sit flat on the bed. Slice and print — see
+   [Printing](#printing) for supports and label notes.
 
 A 5 g water spoon is the default: `volumeMode = "grams"`, `density = 1.0`,
 `gramsPerSpoon = 5`.
@@ -115,23 +118,24 @@ whole numbers; `2.5` gives a 2.5 ml spoon.
 
 | Parameter | Default | Unit | Meaning |
 |---|---|---|---|
-| `bowlMode` | `"auto"` | choice | `Proportional` or `Fixed diameter` |
-| `depthRatio` | `0.5` | ratio | Bowl depth ÷ interior radius (auto mode) |
-| `bowlDiameter` | `25` | mm | Rim diameter of the bowl *interior* (fixed mode) |
+| `bowlMode` | `Proportional` | choice | `Proportional` or `Fixed diameter` |
+| `depthRatio` | `0.5` | ratio | Bowl depth ÷ interior radius (Proportional mode) |
+| `bowlDiameter` | `25` | mm | Rim diameter of the bowl *interior* (Fixed diameter mode) |
 | `wallThickness` | `1.6` | mm | Bowl wall thickness |
 | `rimLip` | `1.2` | mm | Width of the flat rim lip around the opening |
 
 **`bowlMode`** decides whether the script chooses the bowl width for you or
 you choose it and the script works out the depth from the target volume.
 
-- `"auto"` — the **diameter is derived** from the volume and `depthRatio`.
-  Bigger volumes automatically produce bigger bowls. This is the usual choice.
-- `"fixed"` — you set `bowlDiameter`, and the **depth is derived** from the
-  volume. Use this when the spoon has to fit a specific jar, drawer or set
+- `Proportional` (the default) — the **diameter is derived** from the volume and
+  `depthRatio`. Bigger volumes automatically produce bigger bowls. This is the
+  usual choice.
+- `Fixed diameter` — you set `bowlDiameter`, and the **depth is derived** from
+  the volume. Use this when the spoon has to fit a specific jar, drawer or set
   (for example, matching the diameter of an existing spoon).
 
-**`depthRatio`** (auto mode only) sets the shape of the bowl: `d = depthRatio ×
-r`. It controls how shallow or deep the spoon feels:
+**`depthRatio`** (Proportional mode only) sets the shape of the bowl: `d =
+depthRatio × r`. It controls how shallow or deep the spoon feels:
 
 - `0.5` (default) — a fairly shallow, wide spoon that is easy to level and
   scoop with.
@@ -139,16 +143,16 @@ r`. It controls how shallow or deep the spoon feels:
 - below `0.4` — very flat, almost a ladle/scuttle; large in diameter.
 - much above `1.0` — a deep cup-like bowl, harder to fill and level.
 
-In auto mode this value sets only the *shape*; the bowl diameter then follows
-from the target volume and always adjusts to keep the volume constant. The console always echoes the
-resulting radius, diameter and depth.
+In Proportional mode this value sets only the *shape*; the bowl diameter then
+follows from the target volume and always adjusts to keep the volume constant.
+The console always echoes the resulting radius, diameter and depth.
 
-**`bowlDiameter`** (fixed mode only) is the **inside** diameter at the rim, in
-millimetres. The outside diameter is this plus twice `wallThickness`. If you
-make the diameter large compared to the target volume, the computed depth
-becomes very small and the script stops with an error — increase the volume or
-decrease the diameter. Conversely, a tiny diameter with a large volume gives
-an impractically deep bowl and also errors out.
+**`bowlDiameter`** (Fixed diameter mode only) is the **inside** diameter at
+the rim, in millimetres. The outside diameter is this plus twice
+`wallThickness`. If you make the diameter large compared to the target volume,
+the computed depth becomes very small and the script stops with an error —
+increase the volume or decrease the diameter. Conversely, a tiny diameter with
+a large volume gives an impractically deep bowl and also errors out.
 
 **`wallThickness`** is the bowl shell thickness, measured at the rim. `1.6 mm`
 is four 0.4 mm perimeters: stiff enough for a spoon, and the default. Use
@@ -218,7 +222,10 @@ clear the bowl. If that happens, either widen `handleTipWidth`, lengthen
 | `labelFont` | `"Liberation Sans:style=Bold"` | font | Font used for the label |
 
 The label is engraved on the **top of the handle**, centred across the handle
-width and set along its length, reading along the spoon.
+width and set along its length, reading along the spoon. "Top" here means the
+face that is level with the rim — the side you see when the bowl is turned
+up for use. In the recommended print orientation (bowl down) that face lies on
+the build plate, so the label is printed first, face-down.
 
 **`showLabel`**:
 
@@ -227,11 +234,13 @@ width and set along its length, reading along the spoon.
   colour, so the label is subtle and survives wear. This is the default.
 - `"colored"` — the text is engraved and a second solid inlay is generated in
   `textColor`, flush with the handle surface. This is for multi-material
-  printers or a mid-print filament swap, giving a high-contrast label.
+  printers (or a slicer with colour-by-object), giving a high-contrast label.
 
 With `"colored"`, the inlay is a separate object in the model. In OpenSCAD and
 in a 3MF export it can be assigned the second colour; if you export a single
-STL you will get one merged solid and no colour. `labelOverlap` and
+STL you get one merged solid with no colour. On a single-material printer the
+inlay simply fills the groove in the body colour, so use `"cut"` there instead —
+the coloured inlay needs a second material to be visible. `labelOverlap` and
 `labelRecess` are fine-tuning values for the inlay fit: `labelOverlap` makes
 the inlay slightly wider and deeper than the groove so it fuses into the body
 without a hairline gap, and `labelRecess` keeps its top a few microns below the
@@ -352,31 +361,46 @@ Bowl sizes are interior; add `2 × wallThickness` for the outside, plus
 `bowlMode`, `depthRatio`, `wallThickness`, handle settings and colours, and
 only change the volume — they will look like a matched set. If you want every
 spoon in the set to have the **same bowl diameter** (e.g. to stack or to fit a
-holder), use `bowlMode = "fixed"` with a common `bowlDiameter`; the depths will
-then differ instead.
+holder), set `bowlMode` to `Fixed diameter` with a common `bowlDiameter`; the
+depths will then differ instead.
 
 ---
 
 ## Printing
 
-- **Orientation:** as exported — bowl opening up, the bottom of the outer dome
-  on the build plate, with the handle's top surface level with the rim and
-  suspended above the plate.
-- **Supports:** the bowl and label are designed to print without any. The
-  small tip of the dome and the open cavity need none. Do watch the flat
-  underside of the handle, which is cantilevered above the plate: if your
-  printer sags it, add support only under the handle (paint-on supports in
-  your slicer) — never inside the bowl cavity.
+- **Orientation:** turn the exported spoon over so the **bowl opening faces the
+  build plate**. The flat rim lip and the whole handle then rest directly on the
+  bed — the largest possible first-layer footprint — while the outer dome of the
+  bowl grows upward and the handle is no longer a cantilever. The model is
+  exported bowl-up, so flip it 180° in the slicer (or use the slicer's "lay
+  flat" tool on the rim) before slicing.
+- **Supports:** generally none. The handle and rim sit on the plate and need no
+  support. The only overhanging area is the **inside of the bowl**, which is now
+  a shallow ceiling: it curves inward gradually from the vertical rim, so the
+  overhang steepens only as the remaining opening shrinks, and the final
+  closure is a short bridge. Most printers handle this unsupported, with at
+  most a little roughness on the inside top. If your printer sags overhangs, or
+  you print a very wide/shallow bowl (a large `bowlDiameter` for the volume, or
+  `depthRatio` below ~0.4), enable supports **inside the bowl only** —
+  build-plate supports, removable through the opening afterwards — and expect
+  some marks on the measuring surface. Deeper bowls (`depthRatio` closer to or
+  above 1.0) are easier in this orientation than shallow ones.
+- **Label:** the label is on the same face as the rim, so it is printed
+  **face-down** and forms part of the first layers. Use a smooth build plate
+  for the cleanest label face, and keep first-layer squish moderate so the fine
+  grooves do not close up. Once the spoon is turned bowl-up for use, the
+  engraving is on top exactly as intended.
 - **Layer height:** 0.2 mm is a good default. Use 0.12–0.16 mm if you want a
   smoother bowl and a crisper label.
 - **Perimeters:** 3–4. With the default 1.6 mm wall and a 0.4 mm nozzle, four
   perimeters make the bowl wall solid.
 - **Infill:** 15–25 % is plenty; the bowl wall is already solid from
   perimeters.
-- **Layers on top of the label:** if you use `showLabel = "colored"`, add a
-  colour change at the layer where the inlay starts (the top of the handle,
-  `labelDepth` below the surface). If your slicer has a "colour by object"
-  mode, export 3MF and assign the inlay object to the second filament.
+- **Coloured label:** with `showLabel = "colored"`, the inlay is a separate
+  object printed in the first layers (it starts at the bed with the label). Use
+  a multi-material printer, or a slicer with "colour by object" and a 3MF
+  export, and assign the inlay to `textColor`. A single mid-print filament swap
+  colours whole layers and cannot isolate the text.
 - **Material:** PLA is fine for dry ingredients and general kitchen use; PETG
   is tougher and more heat-resistant. **FDM prints are porous and not
   certified food-safe** — especially with printed-in crevices — so use a
@@ -390,7 +414,11 @@ then differ instead.
 The model is dimensionally exact for its intended volume (after faceting
 compensation), but printed volume is not only geometry: extrusion width,
 elephant's foot, layer squish, shrinkage and the faceted surface all shift it
-slightly. To check and correct a real spoon:
+slightly. In the recommended bowl-down orientation, the inside top of the bowl
+is also the last part of the cavity to form, as a shallow overhang: if it sags,
+the spoon holds slightly less. Keep part cooling on, consider supports inside
+the bowl if the ceiling comes out rough, and calibrate the result. To check and
+correct a real spoon:
 
 1. Generate a spoon and set `debugInterior = true`. Slice it and compare the
    slicer's volume report with the console's `Requested volume`.
@@ -444,8 +472,8 @@ to export the cavity plug for verification.
 
 | Symptom | Cause / fix |
 |---|---|
-| "Computed bowl depth is too small" | Fixed mode with a diameter too large for the volume. Increase the volume or decrease `bowlDiameter`, or use `bowlMode = "auto"`. |
-| "Computed bowl depth is unrealistically large" | Fixed mode with a diameter too small for the volume. Increase `bowlDiameter`, reduce the volume, or use auto mode. |
+| "Computed bowl depth is too small" | Fixed diameter mode with a diameter too large for the volume. Increase the volume or decrease `bowlDiameter`, or switch `bowlMode` to Proportional. |
+| "Computed bowl depth is unrealistically large" | Fixed diameter mode with a diameter too small for the volume. Increase `bowlDiameter`, reduce the volume, or switch to Proportional mode. |
 | "Target volume must be greater than 0" | `gramsPerSpoon` or `volumeCm3` is zero/negative, or `density` is invalid in Grams mode. |
 | No text in the model | The font is not installed. Change `labelFont`, or check *Help → Font List*. |
 | Text sticks out past the handle | Label too long or too large. Shorten `labelText`, reduce `labelSize`, or lengthen/widen the handle. |
@@ -454,6 +482,7 @@ to export the cavity plug for verification.
 | Preview flickers / faces look covered | This is an OpenCSG preview artefact; the preview offsets handle the common cases. Press `F6` for a full render before judging. |
 | Coloured inlay not visible in a 3MF | Check that `showLabel = "colored"`, the objects are assigned different materials, and `spoonColor`/`textColor` differ. |
 | Spoon holds slightly the wrong amount | Calibrate with `volumeCorrection` as described above. |
+| Inside top of the bowl is rough or the volume is low | In the bowl-down orientation the inside ceiling is an overhang. Improve part cooling, lower the layer height, or enable supports inside the bowl, then recalibrate. |
 | Model looks faceted | Increase `$fn` (e.g. 128 or 256) and re-render with `F6`. |
 
 ---

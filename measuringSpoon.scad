@@ -18,12 +18,19 @@
 //             solid in textColor. The inlay extends into the body and sits a
 //             few microns below the surface so it fuses and does not z-fight
 //             (labelOverlap / labelRecess).
+// The label is on the handle face that is level with the rim, so in the
+// recommended bowl-down print orientation it is printed face-down in the
+// first layers and reads correctly once the spoon is turned bowl-up.
 // spoonColor sets the body colour. Colours affect the preview/multi-material
 // setup only; an STL export has no colour.
 //
 // The amount is level to the rim (heaping is not modelled). Print with the
-// bowl opening up (bowl tip on the build plate). No supports are needed: the
-// outer dome grows from a small tip and the cavity is open.
+// bowl opening DOWN: the STL is exported bowl-up, so flip it in the slicer
+// and lay the rim lip and handle on the build plate. The outer dome then
+// grows upward and the handle is not a cantilever. No supports are needed for
+// the handle or rim; the only overhang is the bowl's inside ceiling, which is
+// gradual and normally prints unsupported (add supports inside the bowl for
+// very wide, shallow bowls or if the ceiling sags).
 // ---------------------------------------------------------------------------
 
 /* [Volume] */
@@ -34,8 +41,8 @@ volumeCm3         = 1;     // target volume in cm3 (e.g. 1 for a 1 cm3 spoon)
 
 /* [Bowl] */
 bowlMode      = "auto"; // [auto:Proportional, fixed:Fixed diameter]
-depthRatio    = 0.5;    // depth / radius (auto mode)
-bowlDiameter  = 25;     // mm, rim diameter (fixed mode only)
+depthRatio    = 0.5;    // depth / radius (Proportional mode)
+bowlDiameter  = 25;     // mm, rim diameter (Fixed diameter mode only)
 wallThickness = 1.6;    // mm
 rimLip        = 1.2;    // mm flat rim lip, flush with the fill line
 
@@ -98,16 +105,16 @@ function targetVolumeMm3() =
     requestedVolumeMm3() / facetFactor();
 
 // Rim radius of the bowl interior.
-//   auto : fix d = depthRatio * r  ->  r = cbrt(3V / (2*PI*depthRatio))
-//   fixed: r = bowlDiameter / 2
+//   Proportional : fix d = depthRatio * r -> r = cbrt(3V / (2*PI*depthRatio))
+//   Fixed diameter: r = bowlDiameter / 2
 function bowlRadius() =
     bowlMode == "fixed"
         ? bowlDiameter / 2
         : pow(3 * targetVolumeMm3() / (2 * PI * depthRatio), 1 / 3);
 
 // Bowl interior depth.
-//   auto : d = depthRatio * r
-//   fixed: d = 3V / (2*PI*r^2)
+//   Proportional  : d = depthRatio * r
+//   Fixed diameter: d = 3V / (2*PI*r^2)
 function bowlDepth() =
     bowlMode == "fixed"
         ? 3 * targetVolumeMm3() / (2 * PI * pow(bowlRadius(), 2))
