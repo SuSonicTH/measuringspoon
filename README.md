@@ -530,9 +530,24 @@ to export the cavity plug for verification.
 
 - `measuringSpoon.scad` — the parametric model (everything is in this file)
 - `render/` — the sample renders shown in this README
+- `tools/` — helper scripts, including the Markdown-to-PDF builder
 - `README.md` — this document
+- `Manual.pdf` — generated PDF version of this README
 - `LICENSE.md` — MIT licence
 
 ## License
 
 MIT — see [LICENSE.md](LICENSE.md). Copyright (c) 2026 Michael Wolf.
+
+## Manual (PDF)
+
+`Manual.pdf` is a printable PDF build of this README, including the sample
+renders. Regenerate it from the repository root with:
+
+```bash
+./tools/build-manual.sh
+```
+
+The script uses `tools/md2pdf.py` and `uv`; Python dependencies are downloaded
+and cached on first use. See [tools/README.md](tools/README.md) for options and
+details.
